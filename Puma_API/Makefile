@@ -7,8 +7,11 @@ ODIR=obj
 _DEPS = serial_talk.h Puma_OP.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = test.o serial_talk.o Puma_OP.o
+_OBJ = movpos.o serial_talk.o Puma_OP.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+_OBJ2 = movjoints.o serial_talk.o Puma_OP.o
+OBJ2 = $(patsubst %,$(ODIR)/%,$(_OBJ2))
 
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -16,10 +19,13 @@ $(ODIR)/%.o: %.c
 $(ODIR)/%.o: %.cpp
 	$(CPP) -c -o $@ $< $(CFLAGS)
 
-test: $(OBJ)
+movpos: $(OBJ)
 	$(CPP) -o $@.bin $^ $(CFLAGS) 
+
+movjoints: $(OBJ2)
+	$(CPP) -o $@.bin $^ $(CFLAGS)
 
 .PHONY: clean
 
 clean: 
-	rm -rf $(ODIR)/*.o *~ core $(INCDIR)/*~
+	rm -rf $(ODIR)/*.o *~ core $(INCDIR)/*~ *.bin

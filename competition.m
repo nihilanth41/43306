@@ -3,7 +3,8 @@
 addpath(genpath(pwd));
 
 % Load calibration
-load('north_projection.mat');
+%load('puma2_projection.mat');
+load('puma1_projection.mat');
 
 % Establish defend position
 % Use all joints = 30 degrees for now 
@@ -23,15 +24,16 @@ command_format_string='./Puma_API/movpos.bin %3.3f %3.3f %3.3f %3.3f %3.3f %3.3f
 % while(1) -- 
 
 % ACTIVATE DEFEND POSITION
-disp('Activating defend position...')
-retval = system(defend_command_string); 
-if(retval ~= 0) 
-    disp('Error movjoints()');
-    return;
-end
+%disp('Activating defend position...')
+%retval = system(defend_command_string); 
+%if(retval ~= 0) 
+%    disp('Error movjoints()');
+%    return;
+%end
 
 %Take image(s) {left01.ppm, right01.ppm} and put them in CWD. 
-status = system('./snapshot.sh');
+%status = system('calibration/north_2/snapshot.sh');
+status = system('calibration/north_2/snapshot.sh');
 if(status ~= 0) % Check for error
     disp('Error snapshot.sh');
     % Sleep and try again.
@@ -49,11 +51,32 @@ I_r = rgb2gray(img_r);
 level = 0.95;
 bin_l = imbinarize(I_l,level);
 bin_r = imbinarize(I_r,level);
+figure();
+imshow(bin_l);
+
+% erode
+se = strel('rectangle',[20 20]);
+im_erode_l = imerode(bin_l,se);
+figure();
+imshow(im_erode_l);
+
+im_erode_r = imerode(bin_r,se);
+figure();
+imshow(im_erode_r);
+
+% dilate
+im_dilate_l = imdilate(im_erode_l,se);
+figure();
+imshow(im_dilate_l);
+
+im_dilate_r = imdilate(im_erode_r,se);
+figure();
+imshow(im_dilate_r);
 
 % Perform edge detection using Canny algorithm.
 threshold = 0.98;
-[BW_l,threshold_l] = edge(bin_l, 'Canny', threshold);
-[BW_r,threshold_r] = edge(bin_r, 'Canny', threshold);
+[BW_l,threshold_l] = edge(im_dilate_l, 'Canny', threshold);
+[BW_r,threshold_r] = edge(im_dilate_r, 'Canny', threshold);
 
 % Assign labels for detected objects.
 L_l = bwlabel(BW_l);
@@ -67,10 +90,10 @@ stats_r = regionprops(L_r, 'Centroid', 'Orientation', 'Area');
 centroids_l = cat(1, stats_l.Centroid);
 centroids_r = cat(1, stats_r.Centroid);
 
-u_l = centroids_l(1,1);
-v_l = centroids_l(1,2);
-u_r = centroids_r(1,1);
-v_r = centroids_r(1,2);
+u_l = centroids_l(2,1);
+v_l = centroids_l(2,2);
+u_r = centroids_r(2,1);
+v_r = centroids_r(2,2);
 
 % Debugging object orientation
 imshow(BW_l)
@@ -85,13 +108,21 @@ P_wo(4,1) = 1;  % Make 4x1 vector
 % Homogenous transformation of world w.r.t robot. 
 % I.e. position of camera frame w.r.t robot frame. 
 % I.e. steps to move the robot frame to the camera frame w.r.t robot frame.
-tx = -305; % mm
-ty = 358; % mm 
-tz = -312+130; % mm - (325-13-130)
+tx = -400; % mm
+ty = 350; % mm 
+tz = -312; % mm - (-325+13+(130?))
+
+% incorrect
 H_rw = [ 0 -1 0 tx;
          1  0 0 ty;
          0  0 1 tz;
          0  0 0 1 ];
+
+% % new rotation matrix
+% H_rw = [ 1  0  0 tx;
+%          0 -1  0 ty;
+%          0  0 -1 tz;
+%          0  0  0 1 ];
 
 %P_ro - Position of object with respect to the robot. 
 P_ro = H_rw*P_wo
@@ -99,7 +130,7 @@ P_ro = H_rw*P_wo
 % From our 2nd lab report..we used O=90-obj , A=90, T=0
 % Robot x and camera x are aligned
 % Take stats_r.Orientation? Or use average?
-O = stats_l(1).Orientation;
+O = stats_l(2).Orientation;
 O = O-90;
 A = 90.000;
 T = 0.000;

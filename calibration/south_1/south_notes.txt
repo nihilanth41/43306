@@ -1,0 +1,17 @@
+------------> x+
+|camera
+|
+|
+|
+y+
+	
+		y+
+		|
+		|
+		|robot
+		|-------x+
+
+To move robot frame to camera frame (w.r.t robot frame)
+-400mm x 
++350mm y
+-325+13mm == -312mm

@@ -14,16 +14,16 @@ cd /tmp
 
 # Left snapshot
 puma2_save_left &
-sleep 0.5
+sleep 0.25
 killall puma2_save_left
-mv -i -v mvid_save00000.ppm "$CWD/left${number}.ppm"
+mv -v mvid_save00000.ppm "$CWD/left${number}.ppm"
 rm /tmp/*.ppm
 
 # Right snapshot
 puma2_save_right & 
-sleep 0.5
+sleep 0.25
 killall puma2_save_right
-mv -i -v mvid_save00000.ppm "$CWD/right${number}.ppm"
+mv -v mvid_save00000.ppm "$CWD/right${number}.ppm"
 rm /tmp/*.ppm
 
 echo "DONE"

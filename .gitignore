@@ -3,3 +3,5 @@
 *.m~
 *.bin
 *.o
+*.status
+*.ppm

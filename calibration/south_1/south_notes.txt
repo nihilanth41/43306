@@ -15,3 +15,12 @@ To move robot frame to camera frame (w.r.t robot frame)
 -400mm x 
 +350mm y
 -325+13mm == -312mm
+
+horiz_height = 36.5mm
+vert_height = 100mm
+
+z0 = 0
+z1 = 36.5
+z2 = 73
+z3 = 100
+z4 = 136.5

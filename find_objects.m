@@ -47,11 +47,11 @@ threshold = 0.98;
 %ignore edges of picture
 for i = 1:img_rows
     for j = 1:img_cols
-        if (i < top_border_width) | (i > (img_rows - bottom_border_width))
+        if (i < top_border_width) || (i > (img_rows - bottom_border_width))
             BW_l(i,j) = 0;
             BW_r(i,j) = 0;
         end
-        if (j < left_border_width) | (j > (img_cols - right_border_width))
+        if (j < left_border_width) || (j > (img_cols - right_border_width))
             BW_l(i,j) = 0;
             BW_r(i,j) = 0;
         end
